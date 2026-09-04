@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Risk Manager</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --royal-blue: #2457d6;
+            --deep-blue: #173b91;
+            --blue-light: #eef4ff;
+            --blue-border: #d9e5ff;
+            --text: #172033;
+            --muted: #6b7280;
+            --white: #ffffff;
+            --bg: #f6f8fc;
+            --success: #16845b;
+            --warning: #c47a08;
+            --danger: #c93645;
+            --shadow: 0 12px 35px rgba(30, 63, 130, 0.08);
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* =========================
+           TOP NAVIGATION
+        ========================= */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 72px;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid #e6eaf2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            color: var(--deep-blue);
+            font-size: 20px;
+            letter-spacing: -0.4px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--royal-blue), #4a7cff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 900;
+            box-shadow: 0 7px 18px rgba(36,87,214,0.25);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav button {
+            border: none;
+            background: transparent;
+            padding: 10px 15px;
+            border-radius: 9px;
+            color: #586174;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .nav button:hover,
+        .nav button.active {
+            color: var(--royal-blue);
+            background: var(--blue-light);
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            padding: 58px 5% 40px;
+            background:
+                radial-gradient(circle at 80% 20%, rgba(61,115,255,0.13), transparent 28%),
+                linear-gradient(135deg, #ffffff, #f4f7ff);
+            border-bottom: 1px solid #e8edf6;
+        }
+
+        .hero-inner {
+            max-width: 1250px;
+            margin: auto;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 12px;
+            border-radius: 30px;
+            background: var(--blue-light);
+            color: var(--royal-blue);
+            border: 1px solid var(--blue-border);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: clamp(34px, 5vw, 58px);
+            line-height: 1.05;
+            letter-spacing: -2.5px;
+            max-width: 800px;
+            color: #142b62;
+        }
+
+        .hero h1 span {
+            color: var(--royal-blue);
+        }
+
+        .hero p {
+            margin-top: 18px;
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 17px;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .container {
+            max-width: 1250px;
+            margin: auto;
+            padding: 38px 5% 80px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            margin-bottom: 22px;
+        }
+
+        .section-title h2 {
+            font-size: 27px;
+            color: #182b52;
+            letter-spacing: -0.7px;
+        }
+
+        .section-title p {
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        /* =========================
+           INPUT CARD
+        ========================= */
+
+        .analysis-layout {
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid #e5eaf3;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 26px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1d315d;
+            margin-bottom: 20px;
+        }
+
+        .field {
+            margin-bottom: 19px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #4d5870;
+            margin-bottom: 8px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce2ed;
+            border-radius: 10px;
+            outline: none;
+            background: #fbfcff;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--royal-blue);
+            box-shadow: 0 0 0 4px rgba(36,87,214,0.08);
+        }
+
+        .toggle-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .toggle-option {
+            border: 1px solid #dce2ed;
+            background: #fbfcff;
+            border-radius: 11px;
+            padding: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .toggle-option:hover {
+            border-color: var(--royal-blue);
+            background: var(--blue-light);
+        }
+
+        .toggle-option input {
+            accent-color: var(--royal-blue);
+            margin-right: 7px;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            border: none;
+            border-radius: 11px;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--royal-blue), #3469e8);
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 22px rgba(36,87,214,0.2);
+            transition: 0.25s;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 28px rgba(36,87,214,0.27);
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .empty-state {
+            min-height: 390px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 18px;
+            background: var(--blue-light);
+            color: var(--royal-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: 900;
+            margin-bottom: 18px;
+        }
+
+        .empty-state h3 {
+            font-size: 21px;
+            color: #20345e;
+        }
+
+        .empty-state p {
+            max-width: 430px;
+            color: var(--muted);
+            margin-top: 7px;
+        }
+
+        /* =========================
+           RISK RESULT
+        ========================= */
+
+        .risk-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .metric {
+            background: white;
+            border: 1px solid #e4e9f2;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .metric-value {
+            font-size: 25px;
+            font-weight: 900;
+            margin-top: 6px;
+            color: #1a315e;
+        }
+
+        .risk-score {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .risk-score::after {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(36,87,214,0.07);
+            right: -25px;
+            top: -25px;
+        }
+
+        /* =========================
+           GRID
+        ========================= */
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        /* =========================
+           RISK BADGES
+        ========================= */
+
+        .badge {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
+            background: var(--blue-light);
+            color: var(--royal-blue);
+        }
+
+        .badge-danger {
+            background: #fff0f2;
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: #fff7e7;
+            color: var(--warning);
+        }
+
+        .badge-success {
+            background: #eaf8f2;
+            color: var(--success);
+        }
+
+        /* =========================
+           FACTORS
+        ========================= */
+
+        .factor {
+            padding: 16px;
+            border: 1px solid #e7ebf2;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: 0.25s;
+        }
+
+        .factor:hover {
+            transform: translateY(-2px);
+            border-color: #bfd0f8;
+            box-shadow: 0 8px 20px rgba(35,70,130,0.06);
+        }
+
+        .factor-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .factor-name {
+            font-weight: 800;
+            color: #25385d;
+        }
+
+        .points {
+            color: var(--royal-blue);
+            font-weight: 900;
+        }
+
+        .factor p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* =========================
+           MIRROR
+        ========================= */
+
+        .mirror-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mirror-box {
+            padding: 16px;
+            border: 1px solid #e4e9f2;
+            border-radius: 13px;
+            background: #fbfcff;
+            transition: 0.25s;
+        }
+
+        .mirror-box:hover {
+            transform: translateY(-3px);
+            border-color: #b9caf2;
+            background: var(--blue-light);
+        }
+
+        .mirror-box small {
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .mirror-box strong {
+            display: block;
+            margin-top: 4px;
+            color: #20345d;
+        }
+
+        /* =========================
+           DNA FINGERPRINT
+        ========================= */
+
+        .fingerprint-card {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f8faff, #eef4ff);
+            border: 1px solid #d7e2fc;
+            transition: 0.3s;
+        }
+
+        .fingerprint-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 38px rgba(36,87,214,0.13);
+        }
+
+        .fingerprint {
+            font-size: clamp(25px, 4vw, 40px);
+            font-weight: 950;
+            color: var(--royal-blue);
+            letter-spacing: 1px;
+            margin: 13px 0;
+        }
+
+        .dna-components {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .dna-component {
+            padding: 7px 11px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #dbe4f7;
+            font-size: 12px;
+            font-weight: 800;
+            color: #405273;
+        }
+
+        /* =========================
+           SIMILARITY
+        ========================= */
+
+        .similarity-card {
+            position: relative;
+        }
+
+        .similarity-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 9px solid #e3ebff;
+            border-top-color: var(--royal-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 12px auto 15px;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--royal-blue);
+        }
+
+        .similarity-level {
+            text-align: center;
+            font-weight: 800;
+            color: #334a75;
+        }
+
+        /* =========================
+           WHAT IF
+        ========================= */
+
+        .scenario {
+            border: 1px solid #e5eaf2;
+            border-radius: 13px;
+            padding: 15px;
+            margin-bottom: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            transition: 0.25s;
+        }
+
+        .scenario:hover {
+            border-color: #b8caf3;
+            transform: translateX(3px);
+        }
+
+        .scenario-name {
+            font-weight: 700;
+            color: #32435f;
+        }
+
+        .scenario-score {
+            font-weight: 900;
+            color: var(--royal-blue);
+        }
+
+        /* =========================
+           EXPLANATION
+        ========================= */
+
+        .explanation-list {
+            padding-left: 20px;
+        }
+
+        .explanation-list li {
+            margin-bottom: 10px;
+            color: #4e5c73;
+        }
+
+        .decision-box {
+            margin-top: 18px;
+            padding: 17px;
+            background: var(--blue-light);
+            border-left: 4px solid var(--royal-blue);
+            border-radius: 9px;
+            color: #263d68;
+            font-weight: 650;
+        }
+
+        /* =========================
+           COLLAPSIBLE SECTIONS
+        ========================= */
+
+        .collapsible {
+            margin-bottom: 18px;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 19px 21px;
+            background: white;
+            border: 1px solid #e3e8f1;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 7px 22px rgba(20,50,100,0.04);
+        }
+
+        .collapsible-header:hover {
+            border-color: #b9ccef;
+            background: #fbfcff;
+        }
+
+        .collapsible-header h3 {
+            color: #243961;
+            font-size: 16px;
+        }
+
+        .arrow {
+            color: var(--royal-blue);
+            font-size: 19px;
+            transition: 0.25s;
+        }
+
+        .collapsible.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            display: none;
+            margin-top: 10px;
+            background: white;
+            border: 1px solid #e3e8f1;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .collapsible.open .collapsible-content {
+            display: block;
+        }
+
+        /* =========================
+           HISTORY
+        ========================= */
+
+        .history-item {
+            border: 1px solid #e4e9f1;
+            padding: 18px;
+            border-radius: 13px;
+            margin-bottom: 12px;
+            background: #fff;
+        }
+
+        .history-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .history-number {
+            font-weight: 900;
+            color: var(--royal-blue);
+        }
+
+        .history-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .history-detail {
+            background: #f8faff;
+            padding: 11px;
+            border-radius: 9px;
+        }
+
+        .history-detail small {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .history-detail strong {
+            color: #273b61;
+        }
+
+        /* =========================
+           TIMELINE
+        ========================= */
+
+        .timeline {
+            position: relative;
+            padding-left: 35px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #d7e2fa;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 0 0 28px 15px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -34px;
+            top: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--royal-blue);
+            border: 4px solid #dce7ff;
+        }
+
+        .timeline-card {
+            background: white;
+            border: 1px solid #e3e8f1;
+            border-radius: 13px;
+            padding: 17px;
+        }
+
+        .timeline-card h4 {
+            color: #263c68;
+        }
+
+        .timeline-card p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 950px) {
+
+            .nav {
+                display: none;
+            }
+
+            .analysis-layout,
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .risk-overview,
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .history-details {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .hero {
+                padding-top: 40px;
+            }
+
+            .risk-overview,
+            .grid-3,
+            .mirror-row,
+            .history-details {
+                grid-template-columns: 1fr;
+            }
+
+            .toggle-row {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding-left: 4%;
+                padding-right: 4%;
+            }
+
+            .card {
+                padding: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+        <div class="brand-mark">AI</div>
+        AI Risk Manager
+    </div>
+
+    <nav class="nav">
+
+        <button class="nav-btn active"
+                onclick="showSection('home', this)">
+            Home
+        </button>
+
+        <button class="nav-btn"
+                onclick="showSection('analysis', this)">
+            Risk Analysis
+        </button>
+
+        <button class="nav-btn"
+                onclick="showSection('intelligence', this)">
+            Risk Intelligence
+        </button>
+
+        <button class="nav-btn"
+                onclick="showSection('fingerprint', this)">
+            Risk DNA
+        </button>
+
+        <button class="nav-btn"
+                onclick="showSection('history', this)">
+            Analysis History
+        </button>
+
+        <button class="nav-btn"
+                onclick="showSection('timeline', this)">
+            DNA Timeline
+        </button>
+
+    </nav>
+
+</header>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+    <div class="hero-inner">
+
+        <div class="hero-label">
+            Intelligent Behavioral Risk Detection
+        </div>
+
+        <h1>
+            Understand Risk Before
+            <span>It Happens.</span>
+        </h1>
+
+        <p>
+            AI-powered behavioral analysis that evaluates spending,
+            device activity and transaction behavior to create an
+            explainable Risk DNA profile.
+        </p>
+
+    </div>
+
+</section>
+
+
+<div class="container">
+
+<!-- =========================
+     HOME
+========================= -->
+
+<section id="home" class="section active">
+
+    <div class="section-title">
+
+        <h2>Risk Management Overview</h2>
+
+        <p>
+            Analyze transaction behavior and understand why a
+            transaction is considered safe or risky.
+        </p>
+
+    </div>
+
+    <div class="grid-3">
+
+        <div class="card">
+            <div class="metric-label">Behavior Analysis</div>
+            <div class="metric-value">3 Signals</div>
+            <p style="color:var(--muted); margin-top:7px;">
+                Spending, device and transaction speed.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="metric-label">Risk Intelligence</div>
+            <div class="metric-value">90 Points</div>
+            <p style="color:var(--muted); margin-top:7px;">
+                Maximum behavioral risk score.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="metric-label">Decision System</div>
+            <div class="metric-value">Explainable</div>
+            <p style="color:var(--muted); margin-top:7px;">
+                Every decision includes contributing factors.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-title">
+            How the Risk Engine Works
+        </div>
+
+        <div class="grid-3">
+
+            <div class="factor">
+                <div class="factor-name">01. Analyze</div>
+                <p>
+                    The system compares the current transaction
+                    against normal behavioral patterns.
+                </p>
+            </div>
+
+            <div class="factor">
+                <div class="factor-name">02. Build Risk DNA</div>
+                <p>
+                    Spending, device and transaction speed are
+                    converted into a behavioral fingerprint.
+                </p>
+            </div>
+
+            <div class="factor">
+                <div class="factor-name">03. Explain</div>
+                <p>
+                    The system provides risk factors, alternatives,
+                    confidence and recommended action.
+                </p>
+            </div>
+
+        </div>
+
+        <button class="analyze-btn"
+                onclick="showSectionById('analysis')">
+            Start Risk Analysis
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     RISK ANALYSIS
+========================= -->
+
+<section id="analysis" class="section">
+
+    <div class="section-title">
+
+        <h2>Risk Analysis</h2>
+
+        <p>
+            Enter transaction behavior to generate a complete
+            explainable risk assessment.
+        </p>
+
+    </div>
+
+    <div class="analysis-layout">
+
+        <div class="card">
+
+            <div class="card-title">
+                Transaction Information
+            </div>
+
+            <form method="POST">
+
+                <div class="field">
+
+                    <label>
+                        Current Transaction Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        name="amount"
+                        step="0.01"
+                        placeholder="Example: 40000"
+                        required
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Usual Transaction Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        name="usual_amount"
+                        step="0.01"
+                        placeholder="Example: 5000"
+                        required
+                    >
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Device Status
+                    </label>
+
+                    <div class="toggle-row">
+
+                        <label class="toggle-option">
+                            <input
+                                type="radio"
+                                name="new_device"
+                                value="yes"
+                                required
+                            >
+                            New Device
+                        </label>
+
+                        <label class="toggle-option">
+                            <input
+                                type="radio"
+                                name="new_device"
+                                value="no"
+                                required
+                            >
+                            Trusted Device
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        Transaction Speed
+                    </label>
+
+                    <div class="toggle-row">
+
+                        <label class="toggle-option">
+                            <input
+                                type="radio"
+                                name="rapid_transactions"
+                                value="yes"
+                                required
+                            >
+                            Rapid Activity
+                        </label>
+
+                        <label class="toggle-option">
+                            <input
+                                type="radio"
+                                name="rapid_transactions"
+                                value="no"
+                                required
+                            >
+                            Normal Speed
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <button class="analyze-btn" type="submit">
+                    Analyze Transaction
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div>
+
+        {% if result %}
+
+            <div class="risk-overview">
+
+                <div class="metric risk-score">
+
+                    <div class="metric-label">
+                        Risk Score
+                    </div>
+
+                    <div class="metric-value">
+                        {{ result.score }}/90
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Risk Level
+                    </div>
+
+                    <div class="metric-value">
+
+                        {% if result.level == "CRITICAL" %}
+                            <span class="badge badge-danger">
+                                {{ result.level }}
+                            </span>
+                        {% elif result.level == "WARNING" %}
+                            <span class="badge badge-warning">
+                                {{ result.level }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-success">
+                                {{ result.level }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Recommended Action
+                    </div>
+
+                    <div class="metric-value"
+                         style="font-size:17px;">
+                        {{ result.action }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Decision Confidence
+                </div>
+
+                <span class="badge">
+                    {{ result.confidence }}
+                </span>
+
+                <p style="margin-top:10px;color:var(--muted);">
+                    Confidence is based on the number of unusual
+                    behavioral signals detected.
+                </p>
+
+            </div>
+
+        {% else %}
+
+            <div class="card empty-state">
+
+                <div class="empty-icon">
+                    AI
+                </div>
+
+                <h3>
+                    Ready for Risk Analysis
+                </h3>
+
+                <p>
+                    Enter transaction information on the left.
+                    Your complete behavioral risk profile will
+                    appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+        </div>
+
+    </div>
+
+
+    {% if result %}
+
+    <!-- =========================
+         PATTERN + FACTORS
+    ========================= -->
+
+    <div class="grid-2" style="margin-top:22px;">
+
+        <div class="card">
+
+            <div class="card-title">
+                Risk Pattern Classification
+            </div>
+
+            <span class="badge">
+                {{ result.pattern.overall }}
+            </span>
+
+            <div style="margin-top:18px;">
+
+                {% for item in result.pattern.changes %}
+
+                    <div class="factor">
+                        <div class="factor-name">
+                            {{ item }}
+                        </div>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Risk Factor Contribution
+            </div>
+
+            {% for factor in result.contributions %}
+
+                <div class="factor">
+
+                    <div class="factor-top">
+
+                        <span class="factor-name">
+                            {{ factor.factor }}
+                        </span>
+
+                        <span class="points">
+                            +{{ factor.points }}
+                        </span>
+
+                    </div>
+
+                    <p>
+                        {{ factor.reason }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         BEHAVIORAL MIRROR
+    ========================= -->
+
+    <div class="card" style="margin-bottom:22px;">
+
+        <div class="card-title">
+            Behavioral Mirror
+        </div>
+
+        <div class="mirror-row">
+
+            {% for item in result.mirror %}
+
+            <div class="mirror-box">
+
+                <small>
+                    {{ item.category }}
+                </small>
+
+                <strong>
+                    Normal: {{ item.normal }}
+                </strong>
+
+                <strong>
+                    Current: {{ item.current }}
+                </strong>
+
+                <strong style="color:var(--royal-blue);">
+                    Change: {{ item.change }}
+                </strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         DNA + SIMILARITY
+    ========================= -->
+
+    <div class="grid-2">
+
+        <div class="card fingerprint-card"
+             onclick="showSectionById('fingerprint')">
+
+            <div class="card-title">
+                Risk DNA Fingerprint
+            </div>
+
+            <p style="color:var(--muted);">
+                Current behavioral fingerprint
+            </p>
+
+            <div class="fingerprint">
+                {{ result.fingerprint.fingerprint }}
+            </div>
+
+            <div class="dna-components">
+
+                <div class="dna-component">
+                    Spending: {{ result.fingerprint.spending }}
+                </div>
+
+                <div class="dna-component">
+                    Device: {{ result.fingerprint.device }}
+                </div>
+
+                <div class="dna-component">
+                    Speed: {{ result.fingerprint.speed }}
+                </div>
+
+            </div>
+
+            <p style="margin-top:16px;color:var(--royal-blue);font-weight:700;">
+                Open Risk DNA →
+            </p>
+
+        </div>
+
+
+        <div class="card similarity-card">
+
+            <div class="card-title">
+                Risk DNA Similarity
+            </div>
+
+            <div class="similarity-circle">
+
+                {{ result.dna_similarity.similarity }}%
+
+            </div>
+
+            <div class="similarity-level">
+                {{ result.dna_similarity.level }}
+            </div>
+
+            {% if result.dna_similarity.changed_components %}
+
+                <p style="text-align:center;
+                          margin-top:12px;
+                          color:var(--muted);">
+                    Changed:
+                    {{ result.dna_similarity.changed_components | join(", ") }}
+                </p>
+
+            {% else %}
+
+                <p style="text-align:center;
+                          margin-top:12px;
+                          color:var(--muted);">
+                    No behavioral components changed.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         COUNTERFACTUAL
+    ========================= -->
+
+    <div class="card" style="margin-bottom:22px;">
+
+        <div class="card-title">
+            Counterfactual Risk Analysis
+        </div>
+
+        <p style="color:var(--muted);margin-bottom:15px;">
+            Understand how individual behavioral changes
+            could have affected the risk outcome.
+        </p>
+
+        {% for scenario in result.counterfactual %}
+
+        <div class="scenario">
+
+            <span class="scenario-name">
+                {{ scenario.scenario }}
+            </span>
+
+            <span class="scenario-score">
+                {{ scenario.score }}/90
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =========================
+         WHAT IF SIMULATOR
+    ========================= -->
+
+    <div class="card" style="margin-bottom:22px;">
+
+        <div class="card-title">
+            Behavioral Scenario Simulator
+        </div>
+
+        <p style="color:var(--muted);margin-bottom:18px;">
+            Explore how changing individual behavioral conditions
+            could change the final risk decision.
+        </p>
+
+        {% for scenario in result.what_if %}
+
+        <div class="scenario">
+
+            <span class="scenario-name">
+                {{ scenario.scenario }}
+            </span>
+
+            <span>
+
+                <strong class="scenario-score">
+                    {{ scenario.score }}/90
+                </strong>
+
+                <span class="badge"
+                      style="margin-left:8px;">
+                    {{ scenario.level }}
+                </span>
+
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- =========================
+         EXPLANATION
+    ========================= -->
+
+    <div class="card" style="margin-bottom:22px;">
+
+        <div class="card-title">
+            Explainable Risk Decision
+        </div>
+
+        {% if result.explanation.factors %}
+
+        <ul class="explanation-list">
+
+            {% for factor in result.explanation.factors %}
+
+                <li>
+                    {{ factor }}
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% else %}
+
+            <p style="color:var(--muted);">
+                No unusual risk factors were detected.
+            </p>
+
+        {% endif %}
+
+        <div class="decision-box">
+            {{ result.explanation.decision }}
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         COLLAPSIBLE DNA MEMORY
+    ========================= -->
+
+    <div class="collapsible">
+
+        <div class="collapsible-header"
+             onclick="toggleCollapse(this)">
+
+            <h3>
+                Risk DNA Behavioral Memory
+            </h3>
+
+            <span class="arrow">
+                ↓
+            </span>
+
+        </div>
+
+        <div class="collapsible-content">
+
+            <div class="grid-3">
+
+                <div class="factor">
+                    <small>Memory Status</small>
+                    <div class="factor-name">
+                        {{ result.dna_memory.status }}
+                    </div>
+                </div>
+
+                <div class="factor">
+                    <small>Previous Analyses</small>
+                    <div class="factor-name">
+                        {{ result.dna_memory.previous_analyses }}
+                    </div>
+                </div>
+
+                <div class="factor">
+                    <small>Memory Strength</small>
+                    <div class="factor-name">
+                        {{ result.dna_memory.memory_strength }}
+                    </div>
+                </div>
+
+            </div>
+
+            <p style="color:var(--muted);">
+                {{ result.dna_memory.message }}
+            </p>
+
+            {% if result.dna_memory.current_fingerprint %}
+
+            <div style="margin-top:15px;">
+                <strong>Current Behavioral DNA:</strong>
+                <div class="fingerprint"
+                     style="font-size:25px;">
+                    {{ result.dna_memory.current_fingerprint }}
+                </div>
+            </div>
+
+            {% endif %}
+
+            {% if result.dna_memory.dominant_fingerprint %}
+
+            <div>
+                <strong>Dominant Historical DNA:</strong>
+
+                <div class="fingerprint"
+                     style="font-size:25px;">
+                    {{ result.dna_memory.dominant_fingerprint }}
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         EVOLUTION
+    ========================= -->
+
+    <div class="collapsible">
+
+        <div class="collapsible-header"
+             onclick="toggleCollapse(this)">
+
+            <h3>
+                Risk DNA Evolution Score
+            </h3>
+
+            <span class="arrow">
+                ↓
+            </span>
+
+        </div>
+
+        <div class="collapsible-content">
+
+            <div class="metric"
+                 style="margin-bottom:15px;">
+
+                <div class="metric-label">
+                    Evolution Score
+                </div>
+
+                <div class="metric-value">
+                    {{ result.dna_evolution.evolution_score }}%
+                </div>
+
+                <span class="badge"
+                      style="margin-top:8px;">
+                    {{ result.dna_evolution.change_level }}
+                </span>
+
+            </div>
+
+            <p style="color:var(--muted);">
+                {{ result.dna_evolution.message }}
+            </p>
+
+            {% if result.dna_evolution.changed_components %}
+
+            <div style="margin-top:15px;">
+
+                <strong>Changed Components</strong>
+
+                <div class="dna-components"
+                     style="margin-top:10px;">
+
+                    {% for item in result.dna_evolution.changed_components %}
+
+                        <div class="dna-component">
+                            {{ item }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- =========================
+     RISK INTELLIGENCE
+========================= -->
+
+<section id="intelligence" class="section">
+
+    <div class="section-title">
+
+        <h2>Risk Intelligence</h2>
+
+        <p>
+            Advanced interpretation of the current behavioral
+            analysis.
+        </p>
+
+    </div>
+
+    {% if result %}
+
+        <div class="grid-3">
+
+            <div class="card">
+                <div class="metric-label">Current Risk</div>
+                <div class="metric-value">
+                    {{ result.score }}/90
+                </div>
+                <span class="badge">
+                    {{ result.level }}
+                </span>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">Risk Trend</div>
+                <div class="metric-value"
+                     style="font-size:19px;">
+                    {{ result.trend }}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-label">Risk Mutation</div>
+                <div class="metric-value"
+                     style="font-size:19px;">
+                    {{ result.mutation }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-title">
+                Behavioral Intelligence Summary
+            </div>
+
+            <p style="color:var(--muted);">
+                The system combines behavioral changes, Risk DNA,
+                historical memory, confidence, counterfactual
+                analysis and evolution scoring to explain the
+                current transaction risk.
+            </p>
+
+        </div>
+
+    {% else %}
+
+        <div class="card empty-state">
+
+            <div class="empty-icon">RI</div>
+
+            <h3>
+                No Risk Analysis Yet
+            </h3>
+
+            <p>
+                Complete a transaction analysis first to view
+                risk intelligence.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- =========================
+     RISK DNA
+========================= -->
+
+<section id="fingerprint" class="section">
+
+    <div class="section-title">
+
+        <h2>Risk DNA</h2>
+
+        <p>
+            A compact behavioral identity generated from
+            transaction behavior.
+        </p>
+
+    </div>
+
+    {% if result %}
+
+        <div class="grid-2">
+
+            <div class="card fingerprint-card">
+
+                <div class="card-title">
+                    Current Behavioral Fingerprint
+                </div>
+
+                <div class="fingerprint">
+                    {{ result.fingerprint.fingerprint }}
+                </div>
+
+                <div class="dna-components">
+
+                    <div class="dna-component">
+                        Spending:
+                        {{ result.fingerprint.spending }}
+                    </div>
+
+                    <div class="dna-component">
+                        Device:
+                        {{ result.fingerprint.device }}
+                    </div>
+
+                    <div class="dna-component">
+                        Speed:
+                        {{ result.fingerprint.speed }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card similarity-card">
+
+                <div class="card-title">
+                    DNA Similarity
+                </div>
+
+                <div class="similarity-circle">
+                    {{ result.dna_similarity.similarity }}%
+                </div>
+
+                <div class="similarity-level">
+                    {{ result.dna_similarity.level }}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-title">
+                DNA Evolution
+            </div>
+
+            <div class="metric-value">
+                {{ result.dna_evolution.evolution_score }}%
+            </div>
+
+            <span class="badge">
+                {{ result.dna_evolution.change_level }}
+            </span>
+
+            <p style="margin-top:12px;color:var(--muted);">
+                {{ result.dna_evolution.message }}
+            </p>
+
+        </div>
+
+    {% else %}
+
+        <div class="card empty-state">
+
+            <div class="empty-icon">DNA</div>
+
+            <h3>
+                Risk DNA Not Available
+            </h3>
+
+            <p>
+                Run a risk analysis to generate the behavioral
+                fingerprint.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- =========================
+     HISTORY
+========================= -->
+
+<section id="history" class="section">
+
+    <div class="section-title">
+
+        <h2>Risk Analysis History</h2>
+
+        <p>
+            Review previous risk decisions and behavioral
+            fingerprints.
+        </p>
+
+    </div>
+
+    {% if history %}
+
+        {% for item in history | reverse %}
+
+        <div class="history-item">
+
+            <div class="history-top">
+
+                <div>
+                    <span class="history-number">
+                        Analysis #{{ history|length - loop.index0 }}
+                    </span>
+                </div>
+
+                <span class="badge">
+                    {{ item.level }}
+                </span>
+
+            </div>
+
+            <div class="history-details">
+
+                <div class="history-detail">
+                    <small>Risk Score</small>
+                    <strong>
+                        {{ item.score }}/90
+                    </strong>
+                </div>
+
+                <div class="history-detail">
+                    <small>Mutation</small>
+                    <strong>
+                        {{ item.mutation }}
+                    </strong>
+                </div>
+
+                <div class="history-detail">
+                    <small>Action</small>
+                    <strong>
+                        {{ item.action }}
+                    </strong>
+                </div>
+
+                <div class="history-detail">
+                    <small>Risk DNA</small>
+                    <strong>
+                        {{ item.fingerprint.fingerprint }}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card empty-state">
+
+            <div class="empty-icon">H</div>
+
+            <h3>
+                No Analysis History
+            </h3>
+
+            <p>
+                Previous analyses will appear here after
+                transactions are analyzed.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- =========================
+     TIMELINE
+========================= -->
+
+<section id="timeline" class="section">
+
+    <div class="section-title">
+
+        <h2>Risk DNA Change Timeline</h2>
+
+        <p>
+            Observe how behavioral risk changes across
+            consecutive analyses.
+        </p>
+
+    </div>
+
+    {% if result and result.timeline %}
+
+    <div class="card">
+
+        <div class="timeline">
+
+            {% for item in result.timeline %}
+
+            <div class="timeline-item">
+
+                <div class="timeline-dot"></div>
+
+                <div class="timeline-card">
+
+                    <h4>
+                        Analysis #{{ item.analysis }}
+                    </h4>
+
+                    <p>
+                        Previous Score:
+                        {% if item.previous_score is not none %}
+                            {{ item.previous_score }}/90
+                        {% else %}
+                            Baseline
+                        {% endif %}
+                    </p>
+
+                    <p>
+                        Current Score:
+                        {{ item.current_score }}/90
+                    </p>
+
+                    <p>
+                        Risk Change:
+                        {{ item.change }}
+                    </p>
+
+                    <p>
+                        Direction:
+                        {{ item.direction }}
+                    </p>
+
+                    <div style="margin-top:10px;">
+
+                        <span class="badge">
+                            {{ item.mutation }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="card empty-state">
+
+        <div class="empty-icon">T</div>
+
+        <h3>
+            Timeline Will Appear Here
+        </h3>
+
+        <p>
+            Complete analyses to build the behavioral
+            evolution timeline.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+</div>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+    function showSection(sectionId, button) {
+
+        const sections =
+            document.querySelectorAll(".section");
+
+        sections.forEach(function(section) {
+            section.classList.remove("active");
+        });
+
+        const target =
+            document.getElementById(sectionId);
+
+        if (target) {
+            target.classList.add("active");
+        }
+
+        const buttons =
+            document.querySelectorAll(".nav-btn");
+
+        buttons.forEach(function(btn) {
+            btn.classList.remove("active");
+        });
+
+        if (button) {
+            button.classList.add("active");
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+
+    function showSectionById(sectionId) {
+
+        const sections =
+            document.querySelectorAll(".section");
+
+        sections.forEach(function(section) {
+            section.classList.remove("active");
+        });
+
+        const target =
+            document.getElementById(sectionId);
+
+        if (target) {
+            target.classList.add("active");
+        }
+
+        const buttons =
+            document.querySelectorAll(".nav-btn");
+
+        buttons.forEach(function(btn) {
+            btn.classList.remove("active");
+
+            const text =
+                btn.innerText.trim().toLowerCase();
+
+            if (
+                (sectionId === "analysis" &&
+                 text === "risk analysis") ||
+
+                (sectionId === "fingerprint" &&
+                 text === "risk dna") ||
+
+                (sectionId === "history" &&
+                 text === "analysis history") ||
+
+                (sectionId === "timeline" &&
+                 text === "dna timeline") ||
+
+                (sectionId === "intelligence" &&
+                 text === "risk intelligence")
+            ) {
+                btn.classList.add("active");
+            }
+        });
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+
+    function toggleCollapse(header) {
+
+        const parent =
+            header.parentElement;
+
+        parent.classList.toggle("open");
+
+    }
+
+</script>
+
+</body>
+</html>
